@@ -2,6 +2,7 @@ import urllib2
 import sys
 from datetime import date
 from BeautifulSoup import BeautifulSoup
+from weather import get_weather
 
 places = [('Commons','http://www.uvic.ca/services/food/what/cadboromenu/index.php'),
           ('Centre','http://www.uvic.ca/services/food/what/centremenu/index.php'),
@@ -35,6 +36,11 @@ for place in places:
         titles.append( row('h4')[i].string)
         lunch.append( row('p')[i].string + "\n")
     lunch.append("")
+
+forcast = get_weather()
+if forcast:
+    lunch.append("UVic Lunchtime Weather:")
+    lunch.extend(forecast)
 
 # now email the results!
 import smtplib
