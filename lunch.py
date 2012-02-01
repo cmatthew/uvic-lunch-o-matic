@@ -10,8 +10,7 @@ places = [('Commons',
           ('Centre',
            'http://www.uvic.ca/services/food/what/centremenu/index.php'),
           ('VGs',
-           'http://www.uvic.ca/services/food/what/\
-           villagegreensmenu/index.php')]
+           'http://www.uvic.ca/services/food/what/villagegreensmenu/index.php')]
 
 # Map numeric day of week, to english name
 day_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
