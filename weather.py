@@ -3,12 +3,15 @@ import sys
 from datetime import date
 from BeautifulSoup import BeautifulSoup
 
+
 def get_weather():
 
-    soup = BeautifulSoup(urllib2.urlopen("http://www.theweathernetwork.com/hourlyfx/cabc0256/hourlytable/1/?ref=tabs_hourly_table").read())
+    soup = BeautifulSoup(
+        urllib2.urlopen("http://www.theweathernetwork.com/hourlyfx/cabc0256\
+        /hourlytable/1/?ref=tabs_hourly_table").read())
 
-    hour_table =  soup.findAll('td', attrs={'class':'hour'})
-    cond_table =  soup.findAll('td', attrs={'class':'cond'})
+    hour_table = soup.findAll('td', attrs={'class': 'hour'})
+    cond_table = soup.findAll('td', attrs={'class': 'cond'})
 
     results = []
 
