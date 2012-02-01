@@ -4,6 +4,7 @@ from datetime import date
 from BeautifulSoup import BeautifulSoup
 from weather import get_weather
 
+# the names and websites of each food menu
 places = [('Commons',
            'http://www.uvic.ca/services/food/what/cadboromenu/index.php'),
           ('Centre',
@@ -11,6 +12,8 @@ places = [('Commons',
           ('VGs',
            'http://www.uvic.ca/services/food/what/\
            villagegreensmenu/index.php')]
+
+# Map numeric day of week, to english name
 day_of_week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']
 
 #what day of the week is it?  Make 0-4 Monday - Friday
@@ -26,6 +29,7 @@ lunch = []
 #the subject line of the email
 titles = []
 
+# open the url, parse, then pull out lunch info
 for place in places:
     soup = BeautifulSoup(urllib2.urlopen(place[1]).read())
     # get all the id=lunch elements
@@ -41,11 +45,13 @@ for place in places:
         lunch.append(row('p')[i].string + "\n")
     lunch.append("")
 
+# get lunch weather
 forecast = get_weather()
-
+# if we found a lunch forecast, add it
 if forecast:
     lunch.append("UVic Lunchtime Weather:")
     lunch.extend(forecast)
+
 
 # now email the results!
 import smtplib
@@ -55,10 +61,11 @@ toaddrs = 'uvic-lunch@googlegroups.com'
 msg = """\
 From: %s
 To: %s
+Bcc: %s
 Subject: %s
 
 %s
-""" % ("Auto-lunch", toaddrs, ', '.join(titles), '\n'.join(lunch))
+""" % ("Auto-lunch", toaddrs, fromaddr, ', '.join(titles), '\n'.join(lunch))
 
 msg = msg.replace("&amp;", "&")
 
