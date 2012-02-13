@@ -30,52 +30,63 @@ titles = []
 
 # open the url, parse, then pull out lunch info
 for place in places:
-    soup = BeautifulSoup(urllib2.urlopen(place[1]).read())
+    soup = BeautifulSoup(urllib2.urlopen(place[1]).read(),
+                         convertEntities=BeautifulSoup.HTML_ENTITIES)
     # get all the id=lunch elements
     days = soup('div', {'id': 'lunch'})
     # pick the one for this day of the week
-    row = days[day]
     lunch.append(day_of_week[day] + " at " + place[0])
+
+    try:
+        row = days[day]
+    except:
+        lunch.append("Closed.\n")
+
+        continue
 
     # now get the actual text
     for i in xrange(0, len(row('h4'))):
         lunch.append(row('h4')[i].string)
         titles.append(row('h4')[i].string)
         lunch.append(row('p')[i].string + "\n")
+    
+
     lunch.append("")
 
 # get lunch weather
 forecast = get_weather()
 # if we found a lunch forecast, add it
 if forecast:
-    lunch.append("UVic Lunchtime Weather:")
+    lunch.append("UVic Lunchtime Weather:\n")
     lunch.extend(forecast)
 
 
-# now email the results!
-import smtplib
-fromaddr = 'chris4000@gmail.com'
-#toaddrs  = 'chris4000@gmail.com'
-toaddrs = 'uvic-lunch@googlegroups.com'
-msg = """\
-From: %s
+def send_to(email_addr, subject, body ):
+
+    # now email the results!
+    import smtplib
+    fromaddr = 'chris4000@gmail.com'
+    toaddrs  = email_addr
+    msg = """From: %s
 To: %s
 Bcc: %s
 Subject: %s
 
 %s
-""" % ("Auto-lunch", toaddrs, fromaddr, ', '.join(titles), '\n'.join(lunch))
+"""% ("Auto-lunch", toaddrs, fromaddr, ', '.join(subject), '\n'.join(body))
+    
+    # Credentials (if needed)
+    creds = open("/home/cmatthew/credentials", 'r')
+    username = creds.readline()[:-1]  # munis the newline
+    password = creds.readline()[:-1]  # minus the newline
 
-msg = msg.replace("&amp;", "&")
+    # The actual mail send
+    server = smtplib.SMTP('smtp.gmail.com:587')
+    server.starttls()
+    server.login(username, password)
+    server.sendmail(fromaddr, toaddrs, msg.encode("utf-8"))
+    server.quit()
 
-# Credentials (if needed)
-creds = open("credentials", 'r')
-username = creds.readline()[:-1]  # munis the newline
-password = creds.readline()[:-1]  # minus the newline
 
-# The actual mail send
-server = smtplib.SMTP('smtp.gmail.com:587')
-server.starttls()
-server.login(username, password)
-server.sendmail(fromaddr, toaddrs, msg.encode("utf-8"))
-server.quit()
+send_to("chris4000@gmail.com", titles, lunch)
+send_to("uvic-lunch@googlegroups.com", titles, lunch)
